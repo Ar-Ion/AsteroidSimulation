@@ -1,12 +1,15 @@
-#launch Isaac Sim before any other imports
-#default first two lines in any standalone application
-
-
 from environment_base import Environment
 
-from omni.isaac.core import World
-from omni.isaac.core.objects import DynamicCuboid
+import omni
+import omni.usd
+from omni.isaac.core import World, PhysicsContext
+from omni.isaac.core.prims import RigidPrim
+from omni.isaac.core.utils.stage import add_reference_to_stage
+from omni.isaac.core.utils.nucleus import get_assets_root_path
+import omni.isaac.core.utils.prims as prim_utils
 
+from pxr import Gf, Sdf, UsdPhysics
+import carb
 import numpy as np
 
 
@@ -15,31 +18,60 @@ class SpaceEnvironment(Environment):
         super().__init__(world)
 
     def setup_scene(self):
-
-        self._world.scene.add_default_ground_plane()
-
-        fancy_cube = self._world.scene.add(
-            DynamicCuboid(
-                prim_path="/World/random_cube", # The prim path of the cube in the USD stage
-                name="fancy_cube", # The unique name used to retrieve the object from the scene later on
-                position=np.array([0, 0, 1.0]), # Using the current stage units which is in meters by default.
-                scale=np.array([0.5015, 0.5015, 0.5015]), # most arguments accept mainly numpy arrays.
-                color=np.array([0, 0, 1.0]), # RGB channels, going from 0-1
-            )
+        usd_path = "omniverse://localhost/Library/Asteroid.usdc"
+        
+        if usd_path is None:
+            carb.log_error("Failed to load asteroid USD model")
+        
+        # Load USD to rigid body primitive
+        add_reference_to_stage(usd_path=usd_path, prim_path="/World/Asteroid")
+        
+        self._asteroid_prim = RigidPrim(
+            prim_path="/World/Asteroid", 
+            name="asteroid",
+            position=np.array([0.0, 0.0, 0.0]),
+            orientation=np.array([1.0, 0.0, 0.0, 0.0]),
+            scale=[1.0, 1.0, 1.0]
         )
 
-    def setup_post_load(self):
-        self._world = self.get_world()
-        self._cube = self._world.scene.get_object("fancy_cube")
-        self._world.add_physics_callback("sim_step", callback_fn=self.print_cube_info)
+        # Disable motion damping for the asteroid
+        stage = omni.usd.get_context().get_stage()
+        prim_ref = stage.GetPrimAtPath("/World/Asteroid")
 
-    def print_cube_info(self, step_size):
-        position, orientation = self._cube.get_world_pose()
-        linear_velocity = self._cube.get_linear_velocity()
-        # will be shown on terminal
-        #print("Cube position is : " + str(position))
-        #print("Cube's orientation is : " + str(orientation))
-        #print("Cube's linear velocity is : " + str(linear_velocity))
+        omni.kit.commands.execute("AddPhysicsComponentCommand", usd_prim=prim_ref, component="PhysicsRigidBodyAPI")
+        omni.kit.commands.execute("AddPhysicsComponentCommand", usd_prim=prim_ref, component="PhysicsMassAPI")
+
+        damping_attr = prim_ref.GetAttribute("physxRigidBody:angularDamping")
+        damping_attr.Set(0.0)
+
+        self._asteroid_center_attr = prim_ref.GetAttribute("physics:centerOfMass")
+        self._asteroid_inertia_attr = prim_ref.GetAttribute("physics:diagonalInertia")
+        self._asteroid_axes_attr = prim_ref.GetAttribute("physics:principalAxes")
+
+
+        # Disable gravity
+        self._physics_prim = PhysicsContext(prim_path="/World/physicsContext")
+        self._physics_prim.set_gravity(0)
+
+        # Setup lighting
+        self._sun_prim = prim_utils.create_prim(
+            "/World/Sun",
+            "DistantLight",
+            position=np.array([0.0, 0.0, 0.0]),
+            orientation=np.array([1.0, 0.0, 0.0, 0.0]),
+            attributes={
+                "inputs:intensity": 5e3,
+                "inputs:color": (1.0, 1.0, 1.0)
+            }
+        )
+
+        # Add elements to scene
+        self._world.scene.add(self._asteroid_prim)
+
+
+    def setup_post_load(self):
+        velocities = np.full((1, 3), fill_value=0.2)
+        self._asteroid_prim.set_angular_velocity(velocities)
 
     def setup_pre_reset(self):
         return
