@@ -19,10 +19,10 @@ class ROSCamera(Sensor):
         self._camera = Camera(
             name=name,
             prim_path="/World/"+name,
-            position=np.array([0.0, 0.0, 2.0]),
+            position=np.array([0.0, -10.0, 0.0]),
             frequency=fps,
             resolution=resolution,
-            orientation=rot_utils.euler_angles_to_quats(np.array([0, 0, 0]), degrees=True),
+            orientation=rot_utils.euler_angles_to_quats(np.array([90, 0, 90]), degrees=True),
         )
 
     def _start_publisher(self, freq, topic, pub_type):
@@ -67,7 +67,7 @@ class ROSCamera(Sensor):
     def start_sensor(self):
         self._camera.initialize()
         self._start_camera_info_publisher(10)
-        self._start_rgb_publisher(10)
+        self._start_rgb_publisher(30)
         self._start_depth_publisher(10)
 
     def tick_sensor(self):
