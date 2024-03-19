@@ -5,6 +5,6 @@ class Spacecraft(Robot):
     def setup_robot(self):
         self.add_sensor(ROSCamera(
             name="cam1",
-            resolution=(256, 256),
-            fps=10
+            resolution=(1024, 1024),
+            fps=60
         ))
