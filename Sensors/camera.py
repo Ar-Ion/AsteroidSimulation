@@ -53,7 +53,7 @@ class ROSCamera(Sensor, DynamicObject):
 
     def _start_camera_info_publisher(self, freq):
         pub_type = "ROS2PublishCameraInfo"
-        self._start_publisher(freq, "camera_info", pub_type)
+        self._start_publisher(freq, "info", pub_type)
 
     def _start_rgb_publisher(self, freq):
         rv = omni.syntheticdata.SyntheticData.convert_sensor_type_to_rendervar(sd.SensorType.Rgb.name)
