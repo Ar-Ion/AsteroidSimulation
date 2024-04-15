@@ -1,10 +1,10 @@
 from robot_base import Robot
-from Sensors.camera import ROSCamera
+from sensors.camera import ROSCamera, StandardCamera
 
 class Spacecraft(Robot):
     def setup_robot(self):
-        self.add_sensor(ROSCamera(
+        self.add_sensor(StandardCamera(
             name="camera",
             resolution=(1024, 1024),
-            fps=60
+            fps=30
         ))

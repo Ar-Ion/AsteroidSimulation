@@ -5,6 +5,7 @@ import omni.usd
 from omni.isaac.core import PhysicsContext
 from omni.isaac.core.utils.stage import add_reference_to_stage
 import omni.isaac.core.utils.prims as prim_utils
+from scipy.spatial.transform import Rotation
 
 from environment_base import Environment
 from asteroid import Asteroid
@@ -54,3 +55,10 @@ class SpaceEnvironment(Environment):
 
     def world_cleanup(self):
         return
+    
+    def randomize(self):
+        random_quaternion = Rotation.random().as_quat()
+        self._asteroid.get_prim().set_world_pose(orientation=random_quaternion)
+        
+    def get_data_payload(self):
+        return self._asteroid.get_prim().get_world_pose()

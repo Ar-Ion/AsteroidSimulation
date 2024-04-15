@@ -50,6 +50,9 @@ class Environment(object):
     def tick(self):
         for robot in self._robots:
             robot.tick_robot()
+            
+    def get_data_payload(self):
+        pass
 
     def _world_cleanup(self):
         self._world.stop()

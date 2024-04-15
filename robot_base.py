@@ -19,3 +19,6 @@ class Robot(object):
     def tick_robot(self):
         for sensor in self._sensors:
             sensor.tick_sensor()
+            
+    def get_data_payload(self):
+       return list(map(lambda x: x.get_data_payload(), self._sensors))
