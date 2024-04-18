@@ -1,5 +1,6 @@
 import gc
 from abc import abstractmethod
+from astronet_msgs import ImageData
 
 class Robot(object):
     def __init__(self):
@@ -21,4 +22,4 @@ class Robot(object):
             sensor.tick_sensor()
             
     def get_data_payload(self):
-       return list(map(lambda x: x.get_data_payload(), self._sensors))
+       return ImageData.RobotData(list(map(lambda x: x.get_data_payload(), self._sensors)))

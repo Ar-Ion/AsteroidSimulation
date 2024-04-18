@@ -52,7 +52,7 @@ class Environment(object):
             robot.tick_robot()
             
     def get_data_payload(self):
-        pass
+        return None
 
     def _world_cleanup(self):
         self._world.stop()

@@ -8,6 +8,7 @@ import omni.isaac.core.utils.numpy.rotations as rot_utils
 
 from sensors.sensor_base import Sensor
 from dynamics import DynamicObject
+from astronet_msgs import ImageData, Pose
 
 class StandardCamera(Sensor):
     def __init__(self, name, resolution, fps):
@@ -67,14 +68,14 @@ class StandardCamera(Sensor):
         pass
         
     def get_data_payload(self):
-        pose = self._pose
+        pose = Pose(*self._pose)
         k = self._camera_matrix
         rgba = self._rgb.get_data()
         depth = self._depth.get_data().astype(np.half)
 
         grayscale = np.dot(rgba[..., :3], [0.2989, 0.5870, 0.1140]).astype(np.ubyte)
 
-        return (pose, k, grayscale, depth)
+        return ImageData.RobotData.CameraData(pose, k, grayscale, depth)
     
 class ROSCamera(StandardCamera, DynamicObject):
     def __init__(self, name, resolution, fps):

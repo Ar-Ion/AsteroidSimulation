@@ -9,3 +9,6 @@ class Sensor(object):
     @abstractmethod
     def tick_sensor(self):
         return
+    
+    def get_data_payload(self):
+        return None

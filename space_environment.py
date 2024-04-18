@@ -9,6 +9,7 @@ from scipy.spatial.transform import Rotation
 
 from environment_base import Environment
 from asteroid import Asteroid
+from astronet_msgs import ImageData, Pose
 
 class SpaceEnvironment(Environment):
     def __init__(self, world):
@@ -61,4 +62,6 @@ class SpaceEnvironment(Environment):
         self._asteroid.get_prim().set_world_pose(orientation=random_quaternion)
         
     def get_data_payload(self):
-        return self._asteroid.get_prim().get_world_pose()
+        (trans, rot) = self._asteroid.get_prim().get_world_pose()
+        pose = Pose(trans, rot)
+        return ImageData.EnvironmentData(pose)
