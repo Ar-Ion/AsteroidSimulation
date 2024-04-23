@@ -21,13 +21,13 @@ class StandardCamera(Sensor):
 
         # OpenCV camera matrix and width and height of the camera sensor, from the calibration file
         width, height = self._resolution
-        self._camera_matrix = [[512, 0.0, 512], [0.0, 512, 512], [0.0, 0.0, 1.0]]
+        self._camera_matrix = [[1024, 0.0, 512], [0.0, 1024, 512], [0.0, 0.0, 1.0]]
 
         # Pixel size in microns, aperture and focus distance from the camera sensor specification
         # Note: to disable the depth of field effect, set the f_stop to 0.0. This is useful for debugging.
         pixel_size = 3 * 1e-3   # in mm, 3 microns is a common pixel size for high resolution cameras
         f_stop = 1.8            # f-number, the ratio of the lens focal length to the diameter of the entrance pupil
-        focus_distance = 1.5      # in meters, the distance from the camera to the object plane
+        focus_distance = 5      # in meters, the distance from the camera to the object plane
 
         # Calculate the focal length and aperture size from the camera matrix
         ((fx,_,cx),(_,fy,cy),(_,_,_)) = self._camera_matrix
@@ -36,12 +36,14 @@ class StandardCamera(Sensor):
         focal_length_y  = fy * pixel_size
         focal_length = (focal_length_x + focal_length_y) / 2         # The focal length in mm
 
-        position = (0, -1.5, 0)
+        position = (0, -3, 0)
         rotation = (-90, 0, -90)
 
-        self._pose = (np.array([0, -1.5, 0]), np.array([0.5, 0.5, 0.5, 0.5]))
+        self._pose = (np.array(position), np.array([0.5, 0.5, 0.5, 0.5]))
 
         self._camera = rep.create.camera(
+            name=prim_path,
+            parent="/World",
             position=position,
             rotation=rotation,
             focus_distance=focus_distance,

@@ -13,7 +13,7 @@ from space_environment import SpaceEnvironment
 from spacecraft import Spacecraft
 from astronet_frontends import AsyncFrontend, DriveServerFrontend
 from astronet_msgs import ImageData
-
+from matplotlib import pyplot as plt
 print("Loading ROS2 extension...")
 extensions.enable_extension("omni.isaac.ros2_bridge")
 simulation_app.update()
@@ -38,11 +38,11 @@ env.load()
 print("Updating app...")
 simulation_app.update()
 
-dataset_size = 1500
+dataset_size = 700
 
 print("Loading frontend...")
 #frontend_wrapped = TCPFrontend("127.0.0.1", 42666)
-frontend_wrapped = DriveServerFrontend("/home/arion/AsteroidImageDataset/test", dataset_size)
+frontend_wrapped = DriveServerFrontend("/home/arion/AsteroidImageDataset/train", dataset_size)
 frontend = AsyncFrontend(frontend_wrapped, AsyncFrontend.Modes.WAIT)
 frontend.start()
 
@@ -50,7 +50,7 @@ print("Starting simulation...")
 env.start()
 
 for i in range(dataset_size):
-    env.randomize()
+    #env.randomize()
     env.tick()
 
     # start_time = datetime.now()
@@ -60,7 +60,7 @@ for i in range(dataset_size):
 
     robot_data = robot.get_data_payload()
     env_data = env.get_data_payload()
-    
+
     data = ImageData(env_data, robot_data)
 
     frontend.transmit(data)
