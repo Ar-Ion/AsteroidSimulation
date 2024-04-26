@@ -36,6 +36,4 @@ class Asteroid(DynamicObject):
         return self._prim
     
     def setup(self):
-        velocities = np.array((5, 0, 0))
-        self._prim.set_angular_velocity(velocities)
         self.start_tf_publisher()

@@ -58,8 +58,8 @@ class SpaceEnvironment(Environment):
         return
     
     def randomize(self):
-        random_quaternion = Rotation.random().as_quat()
-        self._asteroid.get_prim().set_world_pose(orientation=random_quaternion)
+        velocities = np.random.uniform(low=-10.0, high=10.0, size=(3))
+        self._asteroid.get_prim().set_angular_velocity(velocities)
         
     def get_data_payload(self):
         (trans, rot) = self._asteroid.get_prim().get_world_pose()
