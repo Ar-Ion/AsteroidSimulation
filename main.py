@@ -43,7 +43,7 @@ simulation_app.update()
 
 frontend = {
     "type": "DriveServerFrontend",
-    "source": "/home/arion/AsteroidImageDataset"
+    "source": "~/AsteroidImageDataset"
 }
 
 dataset_size = 65536
