@@ -26,8 +26,8 @@ class StandardCamera(Sensor):
         # Pixel size in microns, aperture and focus distance from the camera sensor specification
         # Note: to disable the depth of field effect, set the f_stop to 0.0. This is useful for debugging.
         pixel_size = 3 * 1e-3   # in mm, 3 microns is a common pixel size for high resolution cameras
-        f_stop = 1.8            # f-number, the ratio of the lens focal length to the diameter of the entrance pupil
-        focus_distance = 5      # in meters, the distance from the camera to the object plane
+        f_stop = 16             # f-number, the ratio of the lens focal length to the diameter of the entrance pupil
+        focus_distance = 6      # in meters, the distance from the camera to the object plane
 
         # Calculate the focal length and aperture size from the camera matrix
         ((fx,_,cx),(_,fy,cy),(_,_,_)) = self._camera_matrix
@@ -46,9 +46,7 @@ class StandardCamera(Sensor):
             parent="/World",
             position=position,
             rotation=rotation,
-            focus_distance=focus_distance,
             focal_length=focal_length,
-            f_stop=f_stop*100,
             horizontal_aperture=horizontal_aperture,
             clipping_range=(0.1, 1.0e5),
             projection_type="pinhole"
@@ -72,8 +70,8 @@ class StandardCamera(Sensor):
     def get_data_payload(self):
         pose = Pose(*self._pose)
         k = self._camera_matrix
-        rgba = self._rgb.get_data()
-        depth = self._depth.get_data().astype(np.half)
+        rgba = self._rgb.get_data().copy()
+        depth = self._depth.get_data().copy()
 
         grayscale = np.dot(rgba[..., :3], [0.2989, 0.5870, 0.1140]).astype(np.ubyte)
 
