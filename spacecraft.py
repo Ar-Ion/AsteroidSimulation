@@ -6,5 +6,5 @@ class Spacecraft(Robot):
         self.add_sensor(StandardCamera(
             name="camera",
             resolution=(1024, 1024),
-            fps=30
+            fps=60
         ))
